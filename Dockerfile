@@ -6,8 +6,10 @@ RUN apt-get install -y python3 python3-pip
 RUN pip3 install watchdog
 
 RUN apt-get update && \
-    apt-get install -y wget gnupg apt-transport-https && \
+    apt-get install -y wget gnupg apt-transport-https cargo libleptonica-dev libtesseract-dev clang && \
     rm -rf /var/lib/apt/lists/*
+
+RUN apt-get install -y tesseract-ocr-eng tesseract-ocr-swe tesseract-ocr-spa tesseract-ocr-nor tesseract-ocr-dan tesseract-ocr-fin tesseract-ocr-fra tesseract-ocr-deu tesseract-ocr-isl
 
 RUN wget -O /usr/share/keyrings/gpg-pub-moritzbunkus.gpg https://mkvtoolnix.download/gpg-pub-moritzbunkus.gpg
 
@@ -18,10 +20,12 @@ RUN apt-get update && \
     apt-get install -y mkvtoolnix && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /home/src_extractor
+RUN cargo install --git https://github.com/elizagamedev/vobsubocr
+
+RUN mkdir -p /home/srt_extractor
 RUN mkdir -p /home/watching
 
-WORKDIR /home/src_extractor
+WORKDIR /home/srt_extractor
 
 COPY . .
 
