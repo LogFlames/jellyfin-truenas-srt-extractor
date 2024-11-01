@@ -9,7 +9,8 @@ RUN apt-get update && \
     apt-get install -y wget gnupg apt-transport-https cargo libleptonica-dev libtesseract-dev clang && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y tesseract-ocr-eng tesseract-ocr-swe tesseract-ocr-spa tesseract-ocr-nor tesseract-ocr-dan tesseract-ocr-fin tesseract-ocr-fra tesseract-ocr-deu tesseract-ocr-isl
+RUN apt-get update && \
+    apt-get install -y tesseract-ocr-eng tesseract-ocr-swe tesseract-ocr-spa tesseract-ocr-nor tesseract-ocr-dan tesseract-ocr-fin tesseract-ocr-fra tesseract-ocr-deu tesseract-ocr-isl
 
 RUN wget -O /usr/share/keyrings/gpg-pub-moritzbunkus.gpg https://mkvtoolnix.download/gpg-pub-moritzbunkus.gpg
 
