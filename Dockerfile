@@ -24,6 +24,8 @@ RUN cargo install --git https://github.com/elizagamedev/vobsubocr
 RUN mkdir -p /home/srt_extractor
 RUN mkdir -p /home/watching
 
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /home/srt_extractor
 
 COPY . .
