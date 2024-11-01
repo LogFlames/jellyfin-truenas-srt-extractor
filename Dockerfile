@@ -6,7 +6,7 @@ RUN apt-get install -y python3 python3-pip
 RUN pip3 install watchdog
 
 RUN apt-get update && \
-    apt-get install -y wget gnupg apt-transport-https cargo libleptonica-dev libtesseract-dev clang && \
+    apt-get install -y wget gnupg apt-transport-https cargo libleptonica-dev libtesseract-dev clang pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && \
@@ -21,7 +21,7 @@ RUN apt-get update && \
     apt-get install -y mkvtoolnix && \
     rm -rf /var/lib/apt/lists/*
 
-RUN cargo install --git https://github.com/elizagamedev/vobsubocr
+RUN cargo install vobsubocr
 
 RUN mkdir -p /home/srt_extractor
 RUN mkdir -p /home/watching
