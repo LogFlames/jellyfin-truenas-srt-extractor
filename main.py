@@ -17,7 +17,7 @@ def process(file):
     tracks = []
     track = {"id": None, "language": "eng", "type": None}
     for line in lines:
-        if line == b'| + Track':
+        if line == '| + Track':
             if track["type"] == "subtitles":
                 tracks.append(track)
             track = {"id": None, "language": "eng"}
