@@ -41,15 +41,19 @@ def process(file):
     target = path.join(path.dirname(file_esc), "extracted_subtitles", path.splitext(path.basename(file_esc))[0])
 
     for track in tracks:
-        print(f"Extracting tracks... {file_esc}")
         target_name = f"{target}_{track['id']}_{track['language']}"
+        output = path.join(path.dirname(file_esc), path.splitext(path.basename(file_esc))[0] + "." + track["language"] + ".srt")
+
+        if path.exists(output):
+            continue
+
+        print(f"Extracting tracks... {file_esc}")
         subprocess.run(f"mkvextract {file_esc} tracks {track['id']}:{target_name}", shell=True)
 
         if track["language"] not in SUPPORTED_LANGUAGES:
             print(f"{track['language']} not supported")
             continue
 
-        output = path.join(path.dirname(file_esc), path.splitext(path.basename(file_esc))[0] + "." + track["language"] + ".srt")
         subprocess.run(f"/root/.cargo/bin/vobsubocr {target_name}.idx --lang {track['language']} -o {output}", shell=True)
 
 
@@ -72,23 +76,24 @@ class MyEventHandler(FileSystemEventHandler):
 
         active_files[fpath] = time.time()
 
-event_handler = MyEventHandler()
-observer = Observer()
-observer.schedule(event_handler, watching, recursive=True)
-observer.start()
+if __name__ == "__main__":
+    event_handler = MyEventHandler()
+    observer = Observer()
+    observer.schedule(event_handler, watching, recursive=True)
+    observer.start()
 
-try:
-    while True:
-        time.sleep(1)
-        to_clean = set()
-        for file in active_files:
-            if time.time() - active_files[file] > 10:
-                to_clean.add(file)
-                print(f"Processing: {file}")
-                process(file)
+    try:
+        while True:
+            time.sleep(1)
+            to_clean = set()
+            for file in active_files:
+                if time.time() - active_files[file] > 10:
+                    to_clean.add(file)
+                    print(f"Processing: {file}")
+                    process(file)
 
-        for file in to_clean:
-            del active_files[file]
-finally:
-    observer.stop()
-    observer.join()
+            for file in to_clean:
+                del active_files[file]
+    finally:
+        observer.stop()
+        observer.join()
