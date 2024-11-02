@@ -12,8 +12,26 @@ active_files = {}
 
 def process(file):
     file_esc = file.replace("(", "\\(").replace(")", "\\)").replace(" ", "\\ ")
-    output = subprocess.run(f'mkvinfo "{file_esc}"', shell=True, capture_output=True)
-    print(output)
+    output = subprocess.run(f'mkvinfo {file_esc}', shell=True, capture_output=True)
+    lines = output.stdout.decode("utf-8").splitlines()
+    tracks = []
+    track = {"id": None, "language": "eng", "type": None}
+    for line in lines:
+        if line == b'| + Track':
+            if track["type"] == "subtitles":
+                tracks.append(track)
+            track = {"id": None, "language": "eng"}
+        if line.startswith("|  + Track UID:"):
+            track["id"] = int(line.split()[-1]) - 1
+        if line.startswith("|  + Track type:"):
+            track["type"] = line.split(": ")[-1]
+        if line.startswith("|  + Language:"):
+            track["language"] = line.split(": ")[-1]
+
+    if track["type"] == "subtitles":
+        tracks.append(track)
+
+    print(tracks)
 
     # get list of tracts
     # extract subtitle tracks
