@@ -1,5 +1,6 @@
 import time
 import subprocess
+import os
 
 from os import path
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
@@ -7,6 +8,8 @@ from watchdog.observers import Observer
 
 dirname = path.dirname(__file__)
 watching = path.join(dirname, "..", "watching")
+
+SUPPORTED_LANGUAGES = {"eng", "swe", "spa", "nor", "dan", "fin", "fra", "deu", "isl"}
 
 active_files = {}
 
@@ -31,12 +34,23 @@ def process(file):
     if track["type"] == "subtitles":
         tracks.append(track)
 
-    print(tracks)
+    subtitles_folder = path.join(path.dirname(file), "extracted_subtitles")
+    if not path.exists(subtitles_folder):
+        os.mkdir(subtitles_folder)
 
-    # get list of tracts
-    # extract subtitle tracks
-    # convert vobsub to srt
-    # save srt file
+    target = path.join(path.dirname(file_esc), "extracted_subtitles", path.splitext(path.basename(file_esc))[0])
+
+    for track in tracks:
+        print(f"Extracting tracks... {file_esc}")
+        target_name = f"{target}_{track['id']}_{track['language']}"
+        subprocess.run(f"mkvextract {file_esc} tracks {track['id']}:{target_name}", shell=True)
+
+        if track["language"] not in SUPPORTED_LANGUAGES:
+            print(f"{track['language']} not supported")
+            continue
+
+        output = path.join(path.dirname(file_esc), path.splitext(path.basename(file_esc))[0] + "." + track["language"] + ".srt")
+        subprocess.run(f"/root/.cargo/bin/vobsubocr {target_name}.idx --lang {track['language']} -o {output}", shell=True)
 
 
 class MyEventHandler(FileSystemEventHandler):
